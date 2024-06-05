@@ -1,7 +1,15 @@
 import streamShell from './streamShell';
-import { cd, pwd } from './commands';
+import { cd, cp, pwd } from './commands';
 
-const { stdout, stderr } = streamShell(cd('src'), pwd, cd('..'), pwd, 'git status', 'git log');
+const { stdout, stderr } = streamShell(
+  cd('src'),
+  pwd,
+  cd('..'),
+  pwd,
+  'git status',
+  'git log',
+//   cp('src/index.ts', '.', '-f')
+);
 
 stdout!.on('data', chunk => console.log(chunk.toString()));
 
