@@ -23,13 +23,15 @@ const streamShell: StreamShell = (...commands: ShellCommand[]) => {
     logger.warn('no commands were specified');
     return {};
   }
-
+  
   const stdout = new Readable({ read() {} });
   const stderr = new Readable({ read() {} });
+  const initialDir = process.cwd();
   let index = 0;
 
   const exec = (command: ShellCommand) => {
     if (!command) {
+      process.chdir(initialDir);
       stdout.push(null);
       stderr.push(null);
       return;
@@ -43,6 +45,7 @@ const streamShell: StreamShell = (...commands: ShellCommand[]) => {
 
     const cp = _exec(command, err => {
       if (err) {
+        process.chdir(initialDir);
         stdout.push(null);
         stderr.push(null);
         return;
@@ -65,6 +68,7 @@ const streamShell: StreamShell = (...commands: ShellCommand[]) => {
   };
 
   exec(commands[index]);
+
   return { stdout, stderr };
 };
 
