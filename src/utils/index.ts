@@ -1,10 +1,13 @@
 import os from 'os';
+import path from 'path';
 import chalk from 'chalk';
 
 // * types
 import type { Schema } from 'joi';
 
 export const isWindows = () => os.platform() === 'win32';
+
+export const toWindowsPath = (p: string) => p.trim().split(path.posix.sep).join(path.sep);
 
 export const validate = (label: string, input: unknown, schema: Schema) => {
   const { error } = schema.label(label).validate(input);
