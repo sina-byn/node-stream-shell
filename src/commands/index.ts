@@ -1,14 +1,16 @@
-import chalk from 'chalk';
+import Joi from 'joi';
 
 // * utils
-import { isWindows } from '../utils';
+import { validate, isWindows, toWindowsPath } from '../utils';
+
+// * schemas
+const stringSchema = Joi.string().min(1).required();
 
 export const pwd = isWindows() ? 'cd' : 'pwd';
 
 export const cd = (path: string) => {
-  if (typeof path !== 'string') {
-    throw new Error(chalk.redBright('you must specify a path for the cd command'));
-  }
+  validate('path', path, stringSchema);
+  path = toWindowsPath(path);
 
   return `cd ${path}`;
 };
