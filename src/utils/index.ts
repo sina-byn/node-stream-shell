@@ -1,6 +1,18 @@
 import os from 'os';
+import chalk from 'chalk';
+
+// * types
+import type { Schema } from 'joi';
 
 export const isWindows = () => os.platform() === 'win32';
+
+export const validate = (label: string, input: unknown, schema: Schema) => {
+  const { error } = schema.label(label).validate(input);
+
+  if (!error) return;
+  const message = error.details[0].message;
+  throw new Error(chalk.redBright(message));
+};
 
 export const parseCommand = (command: string): [string, string] => {
   command = command.trim();
