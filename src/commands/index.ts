@@ -15,6 +15,13 @@ const cpFlags: Options = {
   i: '',
 };
 
+const mvFlags: Options = {
+  u: '',
+  f: '',
+  n: '',
+  i: '',
+};
+
 // * types
 type Options = Record<string, string>;
 
@@ -32,8 +39,10 @@ export const cp = (src: string, dest: string, flags?: string) => {
   validate('dest', dest, stringSchema);
   validate('flags', flags, Joi.string().min(1));
 
-  src = toWindowsPath(src);
-  dest = toWindowsPath(dest);
+  if (isWindows()) {
+    src = toWindowsPath(src);
+    dest = toWindowsPath(dest);
+  }
 
   const command = isWindows() ? 'xcopy' : 'cp';
   if (!flags) return `${command} ${src} ${dest}`;
@@ -48,6 +57,38 @@ export const cp = (src: string, dest: string, flags?: string) => {
     flags = [
       ...new Set(
         flagsArr.map(f => cpFlags[f].split(/\s+/)).flat(1)
+      )
+    ].join(' ');
+  }
+
+  if (!isWindows()) flags = `-${flags}`;
+
+  return `${command} ${src} ${dest} ${flags}`;
+};
+
+export const mv = (src: string, dest: string, flags?: string) => {
+  validate('src', src, stringSchema);
+  validate('dest', dest, stringSchema);
+  validate('flags', flags, Joi.string().min(1));
+
+  if (isWindows()) {
+    src = toWindowsPath(src);
+    dest = toWindowsPath(dest);
+  }
+
+  const command = isWindows() ? 'move' : 'mv';
+  if (!flags) return `${command} ${src} ${dest}`;
+
+  flags = flags.trim();
+  if (flags.startsWith('-')) flags = flags.slice(1);
+
+  if (isWindows()) {
+    const flagsArr = [...new Set(flags.split(''))];
+
+    // prettier-ignore
+    flags = [
+      ...new Set(
+        flagsArr.map(f => mvFlags[f].split(/\s+/)).flat(1)
       )
     ].join(' ');
   }
